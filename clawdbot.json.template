@@ -9,10 +9,5 @@
   },
   "gateway": {
     "port": 18789
-  },
-  "channels": {
-    "webchat": {
-      "enabled": true
-    }
   }
 }
