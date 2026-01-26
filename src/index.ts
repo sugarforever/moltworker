@@ -127,9 +127,9 @@ async function ensureClawdbotGateway(
     if (existingProcess.status === 'starting') {
       console.log('Waiting for existing Clawdbot process to be ready...');
       try {
+        // Use TCP mode - Clawdbot gateway uses WebSocket, not HTTP health endpoint
         await existingProcess.waitForPort(CLAWDBOT_PORT, {
-          mode: 'http',
-          path: '/health',
+          mode: 'tcp',
           timeout: STARTUP_TIMEOUT_MS,
         });
       } catch (e) {
@@ -156,9 +156,9 @@ async function ensureClawdbotGateway(
   // Wait for the gateway to be ready
   try {
     console.log('Waiting for Clawdbot gateway to be ready on port', CLAWDBOT_PORT);
+    // Use TCP mode - Clawdbot gateway uses WebSocket, not HTTP health endpoint
     await process.waitForPort(CLAWDBOT_PORT, {
-      mode: 'http',
-      path: '/health',
+      mode: 'tcp',
       timeout: STARTUP_TIMEOUT_MS,
     });
     console.log('Clawdbot gateway is ready!');
