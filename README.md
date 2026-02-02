@@ -390,6 +390,9 @@ npx wrangler secret put AI_GATEWAY_API_KEY
 # Your AI Gateway endpoint URL
 npx wrangler secret put AI_GATEWAY_BASE_URL
 # Enter: https://gateway.ai.cloudflare.com/v1/{account_id}/{gateway_id}/anthropic
+
+# For OpenRouter, it should be:
+# https://gateway.ai.cloudflare.com/v1/{account_id}/{gateway_id}/openrouter
 ```
 
 4. (Optional) If you have [AI Gateway authentication](https://developers.cloudflare.com/ai-gateway/configuration/authentication/) enabled:
