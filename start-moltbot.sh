@@ -218,6 +218,10 @@ const baseUrl = (process.env.AI_GATEWAY_BASE_URL || process.env.OPENROUTER_BASE_
 const isOpenAI = baseUrl.endsWith('/openai');
 const isOpenRouter = baseUrl.endsWith('/openrouter') || baseUrl.includes('openrouter.ai') || process.env.OPENROUTER_API_KEY;
 
+// AI Gateway authentication header (if gateway auth is enabled)
+const aigAuthToken = process.env.AI_GATEWAY_AUTH_TOKEN;
+const aigAuthHeaders = aigAuthToken ? { 'cf-aig-authorization': 'Bearer ' + aigAuthToken } : null;
+
 if (isOpenRouter) {
     // OpenRouter provider config (uses OpenAI-compatible API)
     const openRouterBaseUrl = baseUrl || 'https://openrouter.ai/api/v1';
@@ -241,6 +245,10 @@ if (isOpenRouter) {
     if (process.env.OPENROUTER_API_KEY) {
         providerConfig.apiKey = process.env.OPENROUTER_API_KEY;
     }
+    // Add AI Gateway auth header if set
+    if (aigAuthHeaders) {
+        providerConfig.headers = aigAuthHeaders;
+    }
     config.models.providers.openrouter = providerConfig;
     // Add models to the allowlist so they appear in /models
     config.agents.defaults.models = config.agents.defaults.models || {};
@@ -258,7 +266,7 @@ if (isOpenRouter) {
     console.log('Configuring OpenAI provider with base URL:', baseUrl);
     config.models = config.models || {};
     config.models.providers = config.models.providers || {};
-    config.models.providers.openai = {
+    const openaiConfig = {
         baseUrl: baseUrl,
         api: 'openai-responses',
         models: [
@@ -267,6 +275,11 @@ if (isOpenRouter) {
             { id: 'gpt-4.5-preview', name: 'GPT-4.5 Preview', contextWindow: 128000 },
         ]
     };
+    // Add AI Gateway auth header if set
+    if (aigAuthHeaders) {
+        openaiConfig.headers = aigAuthHeaders;
+    }
+    config.models.providers.openai = openaiConfig;
     // Add models to the allowlist so they appear in /models
     config.agents.defaults.models = config.agents.defaults.models || {};
     config.agents.defaults.models['openai/gpt-5.2'] = { alias: 'GPT-5.2' };
@@ -289,6 +302,10 @@ if (isOpenRouter) {
     // Include API key in provider config if set (required when using custom baseUrl)
     if (process.env.ANTHROPIC_API_KEY) {
         providerConfig.apiKey = process.env.ANTHROPIC_API_KEY;
+    }
+    // Add AI Gateway auth header if set
+    if (aigAuthHeaders) {
+        providerConfig.headers = aigAuthHeaders;
     }
     config.models.providers.anthropic = providerConfig;
     // Add models to the allowlist so they appear in /models

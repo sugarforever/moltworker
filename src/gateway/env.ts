@@ -38,6 +38,11 @@ export function buildEnvVars(env: MoltbotEnv): Record<string, string> {
     envVars.OPENROUTER_API_KEY = env.OPENROUTER_API_KEY;
   }
 
+  // Pass AI Gateway auth token (for authenticated gateways)
+  if (env.AI_GATEWAY_AUTH_TOKEN) {
+    envVars.AI_GATEWAY_AUTH_TOKEN = env.AI_GATEWAY_AUTH_TOKEN;
+  }
+
   // Pass base URL (used by start-moltbot.sh to determine provider)
   if (normalizedBaseUrl) {
     envVars.AI_GATEWAY_BASE_URL = normalizedBaseUrl;

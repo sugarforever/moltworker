@@ -383,7 +383,14 @@ npx wrangler secret put AI_GATEWAY_BASE_URL
 # Enter: https://gateway.ai.cloudflare.com/v1/{account_id}/{gateway_id}/anthropic
 ```
 
-4. Redeploy:
+4. (Optional) If you have [AI Gateway authentication](https://developers.cloudflare.com/ai-gateway/configuration/authentication/) enabled:
+
+```bash
+npx wrangler secret put AI_GATEWAY_AUTH_TOKEN
+# Enter the token from your gateway's Settings
+```
+
+5. Redeploy:
 
 ```bash
 npm run deploy
@@ -397,6 +404,7 @@ The `AI_GATEWAY_*` variables take precedence over `ANTHROPIC_*` if both are set.
 |--------|----------|-------------|
 | `AI_GATEWAY_API_KEY` | Yes* | API key for your AI Gateway provider (requires `AI_GATEWAY_BASE_URL`) |
 | `AI_GATEWAY_BASE_URL` | Yes* | AI Gateway endpoint URL (required when using `AI_GATEWAY_API_KEY`) |
+| `AI_GATEWAY_AUTH_TOKEN` | No | AI Gateway authentication token (if gateway auth is enabled) |
 | `ANTHROPIC_API_KEY` | Yes* | Direct Anthropic API key (fallback if AI Gateway not configured) |
 | `ANTHROPIC_BASE_URL` | No | Direct Anthropic API base URL (fallback) |
 | `OPENAI_API_KEY` | No | OpenAI API key (alternative provider) |
