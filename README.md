@@ -11,7 +11,11 @@ Run [OpenClaw](https://github.com/openclaw/openclaw) (formerly Moltbot, formerly
 ## Requirements
 
 - [Workers Paid plan](https://www.cloudflare.com/plans/developer-platform/) ($5 USD/month) — required for Cloudflare Sandbox containers
-- [Anthropic API key](https://console.anthropic.com/) — for Claude access, or you can use AI Gateway's [Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/)
+- An API key from one of the supported providers:
+  - [OpenRouter](https://openrouter.ai/) — access to multiple AI models (recommended)
+  - [Anthropic](https://console.anthropic.com/) — for Claude access
+  - [OpenAI](https://platform.openai.com/) — for GPT models
+  - Or use AI Gateway's [Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/)
 
 The following Cloudflare features used by this project have free tiers:
 - Cloudflare Access (authentication)
@@ -43,10 +47,15 @@ _Cloudflare Sandboxes are available on the [Workers Paid plan](https://dash.clou
 # Install dependencies
 npm install
 
-# Set your API key (direct Anthropic access)
-npx wrangler secret put ANTHROPIC_API_KEY
+# Set your API key (choose ONE of the following options)
 
-# Or use AI Gateway instead (see "Optional: Cloudflare AI Gateway" below)
+# Option 1: OpenRouter (recommended - access to multiple AI models)
+npx wrangler secret put OPENROUTER_API_KEY
+
+# Option 2: Direct Anthropic access
+# npx wrangler secret put ANTHROPIC_API_KEY
+
+# Option 3: Use AI Gateway (see "Optional: Cloudflare AI Gateway" below)
 # npx wrangler secret put AI_GATEWAY_API_KEY
 # npx wrangler secret put AI_GATEWAY_BASE_URL
 
@@ -326,9 +335,9 @@ node /root/clawd/skills/cloudflare-browser/scripts/video.js "https://site1.com,h
 
 See `skills/cloudflare-browser/SKILL.md` for full documentation.
 
-## Optional: OpenRouter
+## Optional: OpenRouter (Recommended)
 
-[OpenRouter](https://openrouter.ai/) provides access to multiple AI models through a single API. This is the simplest way to use models from different providers.
+[OpenRouter](https://openrouter.ai/) provides access to multiple AI models through a single API. This is the simplest way to use models from different providers including GPT-4o, Gemini, DeepSeek, and more.
 
 ### Setup
 
