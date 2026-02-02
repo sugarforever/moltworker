@@ -208,14 +208,51 @@ if (process.env.SLACK_BOT_TOKEN && process.env.SLACK_APP_TOKEN) {
     config.channels.slack.enabled = true;
 }
 
-// Base URL override (e.g., for Cloudflare AI Gateway)
-// Usage: Set AI_GATEWAY_BASE_URL or ANTHROPIC_BASE_URL to your endpoint like:
+// Base URL override (e.g., for Cloudflare AI Gateway or direct provider)
+// Usage: Set AI_GATEWAY_BASE_URL, ANTHROPIC_BASE_URL, or OPENROUTER_BASE_URL to your endpoint like:
 //   https://gateway.ai.cloudflare.com/v1/{account_id}/{gateway_id}/anthropic
 //   https://gateway.ai.cloudflare.com/v1/{account_id}/{gateway_id}/openai
-const baseUrl = (process.env.AI_GATEWAY_BASE_URL || process.env.ANTHROPIC_BASE_URL || '').replace(/\/+$/, '');
+//   https://gateway.ai.cloudflare.com/v1/{account_id}/{gateway_id}/openrouter
+//   https://openrouter.ai/api/v1
+const baseUrl = (process.env.AI_GATEWAY_BASE_URL || process.env.OPENROUTER_BASE_URL || process.env.ANTHROPIC_BASE_URL || '').replace(/\/+$/, '');
 const isOpenAI = baseUrl.endsWith('/openai');
+const isOpenRouter = baseUrl.endsWith('/openrouter') || baseUrl.includes('openrouter.ai') || process.env.OPENROUTER_API_KEY;
 
-if (isOpenAI) {
+if (isOpenRouter) {
+    // OpenRouter provider config (uses OpenAI-compatible API)
+    const openRouterBaseUrl = baseUrl || 'https://openrouter.ai/api/v1';
+    console.log('Configuring OpenRouter provider with base URL:', openRouterBaseUrl);
+    config.models = config.models || {};
+    config.models.providers = config.models.providers || {};
+    const providerConfig = {
+        baseUrl: openRouterBaseUrl,
+        api: 'openai-completions',
+        models: [
+            { id: 'moonshotai/kimi-k2.5', name: 'Kimi K2.5', contextWindow: 128000 },
+            { id: 'anthropic/claude-sonnet-4', name: 'Claude Sonnet 4', contextWindow: 200000 },
+            { id: 'anthropic/claude-3.5-sonnet', name: 'Claude 3.5 Sonnet', contextWindow: 200000 },
+            { id: 'openai/gpt-4o', name: 'GPT-4o', contextWindow: 128000 },
+            { id: 'openai/gpt-4o-mini', name: 'GPT-4o Mini', contextWindow: 128000 },
+            { id: 'google/gemini-2.0-flash-001', name: 'Gemini 2.0 Flash', contextWindow: 1000000 },
+            { id: 'deepseek/deepseek-chat', name: 'DeepSeek Chat', contextWindow: 64000 },
+        ]
+    };
+    // Include API key in provider config if set
+    if (process.env.OPENROUTER_API_KEY) {
+        providerConfig.apiKey = process.env.OPENROUTER_API_KEY;
+    }
+    config.models.providers.openrouter = providerConfig;
+    // Add models to the allowlist so they appear in /models
+    config.agents.defaults.models = config.agents.defaults.models || {};
+    config.agents.defaults.models['openrouter/moonshotai/kimi-k2.5'] = { alias: 'Kimi K2.5' };
+    config.agents.defaults.models['openrouter/anthropic/claude-sonnet-4'] = { alias: 'Claude Sonnet 4' };
+    config.agents.defaults.models['openrouter/anthropic/claude-3.5-sonnet'] = { alias: 'Claude 3.5 Sonnet' };
+    config.agents.defaults.models['openrouter/openai/gpt-4o'] = { alias: 'GPT-4o' };
+    config.agents.defaults.models['openrouter/openai/gpt-4o-mini'] = { alias: 'GPT-4o Mini' };
+    config.agents.defaults.models['openrouter/google/gemini-2.0-flash-001'] = { alias: 'Gemini 2.0 Flash' };
+    config.agents.defaults.models['openrouter/deepseek/deepseek-chat'] = { alias: 'DeepSeek' };
+    config.agents.defaults.model.primary = 'openrouter/moonshotai/kimi-k2.5';
+} else if (isOpenAI) {
     // Create custom openai provider config with baseUrl override
     // Omit apiKey so moltbot falls back to OPENAI_API_KEY env var
     console.log('Configuring OpenAI provider with base URL:', baseUrl);

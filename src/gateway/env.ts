@@ -2,7 +2,7 @@ import type { MoltbotEnv } from '../types';
 
 /**
  * Build environment variables to pass to the Moltbot container process
- * 
+ *
  * @param env - Worker environment bindings
  * @returns Environment variables record
  */
@@ -12,11 +12,15 @@ export function buildEnvVars(env: MoltbotEnv): Record<string, string> {
   // Normalize the base URL by removing trailing slashes
   const normalizedBaseUrl = env.AI_GATEWAY_BASE_URL?.replace(/\/+$/, '');
   const isOpenAIGateway = normalizedBaseUrl?.endsWith('/openai');
+  const isOpenRouterGateway = normalizedBaseUrl?.endsWith('/openrouter') ||
+                               normalizedBaseUrl?.includes('openrouter.ai');
 
   // AI Gateway vars take precedence
   // Map to the appropriate provider env var based on the gateway endpoint
   if (env.AI_GATEWAY_API_KEY) {
-    if (isOpenAIGateway) {
+    if (isOpenRouterGateway) {
+      envVars.OPENROUTER_API_KEY = env.AI_GATEWAY_API_KEY;
+    } else if (isOpenAIGateway) {
       envVars.OPENAI_API_KEY = env.AI_GATEWAY_API_KEY;
     } else {
       envVars.ANTHROPIC_API_KEY = env.AI_GATEWAY_API_KEY;
@@ -30,16 +34,24 @@ export function buildEnvVars(env: MoltbotEnv): Record<string, string> {
   if (!envVars.OPENAI_API_KEY && env.OPENAI_API_KEY) {
     envVars.OPENAI_API_KEY = env.OPENAI_API_KEY;
   }
+  if (!envVars.OPENROUTER_API_KEY && env.OPENROUTER_API_KEY) {
+    envVars.OPENROUTER_API_KEY = env.OPENROUTER_API_KEY;
+  }
 
   // Pass base URL (used by start-moltbot.sh to determine provider)
   if (normalizedBaseUrl) {
     envVars.AI_GATEWAY_BASE_URL = normalizedBaseUrl;
     // Also set the provider-specific base URL env var
-    if (isOpenAIGateway) {
+    if (isOpenRouterGateway) {
+      envVars.OPENROUTER_BASE_URL = normalizedBaseUrl;
+    } else if (isOpenAIGateway) {
       envVars.OPENAI_BASE_URL = normalizedBaseUrl;
     } else {
       envVars.ANTHROPIC_BASE_URL = normalizedBaseUrl;
     }
+  } else if (env.OPENROUTER_API_KEY || env.OPENROUTER_BASE_URL) {
+    // Direct OpenRouter configuration (no AI Gateway)
+    envVars.OPENROUTER_BASE_URL = env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1';
   } else if (env.ANTHROPIC_BASE_URL) {
     envVars.ANTHROPIC_BASE_URL = env.ANTHROPIC_BASE_URL;
   }

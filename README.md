@@ -326,6 +326,42 @@ node /root/clawd/skills/cloudflare-browser/scripts/video.js "https://site1.com,h
 
 See `skills/cloudflare-browser/SKILL.md` for full documentation.
 
+## Optional: OpenRouter
+
+[OpenRouter](https://openrouter.ai/) provides access to multiple AI models through a single API. This is the simplest way to use models from different providers.
+
+### Setup
+
+```bash
+# Set your OpenRouter API key
+npx wrangler secret put OPENROUTER_API_KEY
+
+# Deploy
+npm run deploy
+```
+
+That's it! The default base URL (`https://openrouter.ai/api/v1`) is used automatically.
+
+### Available Models
+
+The following models are pre-configured:
+- `moonshotai/kimi-k2.5` (default)
+- `anthropic/claude-sonnet-4`
+- `anthropic/claude-3.5-sonnet`
+- `openai/gpt-4o`
+- `openai/gpt-4o-mini`
+- `google/gemini-2.0-flash-001`
+- `deepseek/deepseek-chat`
+
+### Custom Base URL (Optional)
+
+If you need a custom base URL (e.g., for a proxy):
+
+```bash
+npx wrangler secret put OPENROUTER_BASE_URL
+# Enter your custom URL
+```
+
 ## Optional: Cloudflare AI Gateway
 
 You can route API requests through [Cloudflare AI Gateway](https://developers.cloudflare.com/ai-gateway/) for caching, rate limiting, analytics, and cost tracking. AI Gateway supports multiple providers — configure your preferred provider in the gateway and use these env vars:
@@ -364,6 +400,8 @@ The `AI_GATEWAY_*` variables take precedence over `ANTHROPIC_*` if both are set.
 | `ANTHROPIC_API_KEY` | Yes* | Direct Anthropic API key (fallback if AI Gateway not configured) |
 | `ANTHROPIC_BASE_URL` | No | Direct Anthropic API base URL (fallback) |
 | `OPENAI_API_KEY` | No | OpenAI API key (alternative provider) |
+| `OPENROUTER_API_KEY` | No | OpenRouter API key (multi-provider access) |
+| `OPENROUTER_BASE_URL` | No | OpenRouter base URL (defaults to `https://openrouter.ai/api/v1`) |
 | `CF_ACCESS_TEAM_DOMAIN` | Yes* | Cloudflare Access team domain (required for admin UI) |
 | `CF_ACCESS_AUD` | Yes* | Cloudflare Access application audience (required for admin UI) |
 | `MOLTBOT_GATEWAY_TOKEN` | Yes | Gateway token for authentication (pass via `?token=` query param) |

@@ -14,6 +14,8 @@ export interface MoltbotEnv {
   ANTHROPIC_API_KEY?: string;
   ANTHROPIC_BASE_URL?: string;
   OPENAI_API_KEY?: string;
+  OPENROUTER_API_KEY?: string;
+  OPENROUTER_BASE_URL?: string;
   MOLTBOT_GATEWAY_TOKEN?: string; // Gateway token (mapped to CLAWDBOT_GATEWAY_TOKEN for container)
 
   CLAWDBOT_BIND_MODE?: string;
